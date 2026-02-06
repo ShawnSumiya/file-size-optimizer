@@ -173,5 +173,6 @@ export async function compressVideo(
   await ffmpeg.deleteFile('input.mp4')
   await ffmpeg.deleteFile(outputFileName)
 
-  return new Blob([data], { type: 'video/mp4' })
+  // Vercel ビルド時の型エラー（FileData が BlobPart に割り当てられない）を回避するために型アサーションを付与
+  return new Blob([data as any], { type: 'video/mp4' })
 }
