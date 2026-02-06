@@ -14,20 +14,47 @@ type Preset = {
   safeValue: number
 }
 
-const PRESETS: Preset[] = [
-  // ハンドメイド・販売
-  { name: 'Etsy', limit: 20, safeValue: 19.5 },
-  { name: 'BOOTH', limit: 1000, safeValue: 500 }, // BOOTH上限は10GBだがブラウザ処理とDLのしやすさを考慮し500MB推奨
+type PresetGroup = {
+  label: string
+  items: Preset[]
+}
 
-  // SNS
-  { name: 'X (Twitter)', limit: 512, safeValue: 500 }, // Web/Pro上限
-  { name: 'Instagram', limit: 4000, safeValue: 1000 }, // リール上限は4GBだがブラウザ処理限界を考慮し1GB
-  { name: 'TikTok', limit: 72, safeValue: 70 }, // Android版の制限(72MB)に合わせるのが最も安全
-
-  // メッセンジャー・その他
-  { name: 'Discord (Free)', limit: 8, safeValue: 7.8 },
-  { name: 'Discord (Nitro)', limit: 50, safeValue: 49.5 },
-  { name: 'Gmail', limit: 25, safeValue: 24.5 },
+const PRESET_GROUPS: PresetGroup[] = [
+  {
+    label: 'ハンドメイド・販売',
+    items: [
+      { name: 'Etsy', limit: 20, safeValue: 19.5 },
+      {
+        name: 'BOOTH',
+        limit: 1000,
+        safeValue: 500, // BOOTH上限は10GBだがブラウザ処理とDLのしやすさを考慮し500MB推奨
+      },
+    ],
+  },
+  {
+    label: 'SNS',
+    items: [
+      { name: 'X (Twitter)', limit: 512, safeValue: 500 }, // Web/Pro上限
+      {
+        name: 'Instagram',
+        limit: 4000,
+        safeValue: 1000, // リール上限は4GBだがブラウザ処理限界を考慮し1GB
+      },
+      {
+        name: 'TikTok',
+        limit: 72,
+        safeValue: 70, // Android版の制限(72MB)に合わせるのが最も安全
+      },
+    ],
+  },
+  {
+    label: 'メッセンジャー・その他',
+    items: [
+      { name: 'Discord (Free)', limit: 8, safeValue: 7.8 },
+      { name: 'Discord (Nitro)', limit: 50, safeValue: 49.5 },
+      { name: 'Gmail', limit: 25, safeValue: 24.5 },
+    ],
+  },
 ]
 
 function isVideoFile(file: File): boolean {
@@ -146,7 +173,7 @@ function App() {
               />
               <Settings
                 targetSizeMB={targetSizeMB}
-                presets={PRESETS}
+                presetGroups={PRESET_GROUPS}
                 selectedPresetName={selectedPresetName}
                 onPresetChange={handlePresetChange}
                 maintainResolution={maintainResolution}
@@ -177,7 +204,7 @@ function App() {
                 <>
                   <Settings
                     targetSizeMB={targetSizeMB}
-                    presets={PRESETS}
+                    presetGroups={PRESET_GROUPS}
                     selectedPresetName={selectedPresetName}
                     onPresetChange={handlePresetChange}
                     maintainResolution={maintainResolution}

@@ -3,6 +3,7 @@ import { Switch } from './ui/Switch'
 import { Label } from './ui/Label'
 
 type Preset = { name: string; limit: number; safeValue: number }
+type PresetGroup = { label: string; items: Preset[] }
 
 interface SettingsProps {
   targetSizeMB: number
@@ -10,7 +11,7 @@ interface SettingsProps {
   onTargetSizeChange: (size: number) => void
   onMaintainResolutionChange: (maintain: boolean) => void
   disabled?: boolean
-  presets: Preset[]
+  presetGroups: PresetGroup[]
   selectedPresetName: string | null
   onPresetChange: (preset: Preset) => void
 }
@@ -21,10 +22,12 @@ export function Settings({
   onTargetSizeChange,
   onMaintainResolutionChange,
   disabled,
-  presets,
+  presetGroups,
   selectedPresetName,
   onPresetChange,
 }: SettingsProps) {
+  const allPresets = presetGroups.flatMap((group) => group.items)
+
   return (
     <div className="space-y-4">
       <div>
@@ -34,7 +37,7 @@ export function Settings({
           className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           value={selectedPresetName ?? ''}
           onChange={(e) => {
-            const preset = presets.find((p) => p.name === e.target.value)
+            const preset = allPresets.find((p) => p.name === e.target.value)
             if (preset) {
               onPresetChange(preset)
             }
@@ -42,10 +45,14 @@ export function Settings({
           disabled={disabled}
         >
           <option value="">カスタム（手動でサイズを指定）</option>
-          {presets.map((preset) => (
-            <option key={preset.name} value={preset.name}>
-              {preset.name}（上限 {preset.limit}MB / 安全値 {preset.safeValue}MB）
-            </option>
+          {presetGroups.map((group) => (
+            <optgroup key={group.label} label={group.label}>
+              {group.items.map((preset) => (
+                <option key={preset.name} value={preset.name}>
+                  {preset.name}（上限 {preset.limit}MB / 安全値 {preset.safeValue}MB）
+                </option>
+              ))}
+            </optgroup>
           ))}
         </select>
         <p className="text-xs text-gray-500 mt-1">
