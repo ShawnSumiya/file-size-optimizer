@@ -33,7 +33,7 @@ function isImageFile(file: File): boolean {
 function App() {
   const [file, setFile] = useState<File | null>(null)
   const [targetSizeMB, setTargetSizeMB] = useState(19.5)
-  const [selectedPresetName, setSelectedPresetName] = useState<string>('')
+  const [selectedPresetName, setSelectedPresetName] = useState<string | null>(null)
   const [maintainResolution, setMaintainResolution] = useState(true)
   const [processingState, setProcessingState] = useState<ProcessingState>('idle')
   const [progress, setProgress] = useState(0)
@@ -44,15 +44,12 @@ function App() {
   const handleTargetSizeChange = (size: number) => {
     setTargetSizeMB(size)
     // 手動入力が行われた場合はプリセット選択をリセット
-    setSelectedPresetName('')
+    setSelectedPresetName(null)
   }
 
-  const handlePresetChange = (presetName: string) => {
-    setSelectedPresetName(presetName)
-    const preset = PRESETS.find((p) => p.name === presetName)
-    if (preset) {
-      setTargetSizeMB(preset.safeValue)
-    }
+  const handlePresetChange = (preset: Preset) => {
+    setSelectedPresetName(preset.name)
+    setTargetSizeMB(preset.safeValue)
   }
 
   const handleFileSelect = (selectedFile: File) => {
