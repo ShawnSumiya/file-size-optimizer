@@ -8,6 +8,13 @@ interface SettingsProps {
   onTargetSizeChange: (size: number) => void
   onMaintainResolutionChange: (maintain: boolean) => void
   disabled?: boolean
+  presets?: {
+    name: string
+    limit: number
+    safeValue: number
+  }[]
+  selectedPresetName?: string
+  onPresetChange?: (name: string) => void
 }
 
 export function Settings({
@@ -19,6 +26,29 @@ export function Settings({
 }: SettingsProps) {
   return (
     <div className="space-y-4">
+      {presets && onPresetChange && (
+        <div>
+          <Label htmlFor="preset">アップロード先サービス（クイックプリセット）</Label>
+          <select
+            id="preset"
+            className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            value={selectedPresetName ?? ''}
+            onChange={(e) => onPresetChange(e.target.value)}
+            disabled={disabled}
+          >
+            <option value="">カスタム（手動でサイズを指定）</option>
+            {presets.map((preset) => (
+              <option key={preset.name} value={preset.name}>
+                {preset.name}（上限 {preset.limit}MB / 安全値 {preset.safeValue}MB）
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-gray-500 mt-1">
+            サービスを選ぶと、そのサービスに安全にアップロードできる目標ファイルサイズが自動で入力されます。
+          </p>
+        </div>
+      )}
+
       <div>
         <Label htmlFor="target-size">目標ファイルサイズ (MB)</Label>
         <Input

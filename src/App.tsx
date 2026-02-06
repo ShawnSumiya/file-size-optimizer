@@ -8,6 +8,20 @@ import { compressImage } from './utils/imageCompression'
 
 type ProcessingState = 'idle' | 'processing' | 'completed' | 'error'
 
+type Preset = {
+  name: string
+  limit: number
+  safeValue: number
+}
+
+const PRESETS: Preset[] = [
+  { name: 'Etsy', limit: 20, safeValue: 19.5 },
+  { name: 'Discord (Free)', limit: 8, safeValue: 7.8 },
+  { name: 'Gmail', limit: 25, safeValue: 24.5 },
+  { name: 'WhatsApp', limit: 16, safeValue: 15.5 },
+  { name: 'WeChat', limit: 25, safeValue: 24.5 },
+]
+
 function isVideoFile(file: File): boolean {
   return file.type.startsWith('video/')
 }
@@ -19,12 +33,27 @@ function isImageFile(file: File): boolean {
 function App() {
   const [file, setFile] = useState<File | null>(null)
   const [targetSizeMB, setTargetSizeMB] = useState(19.5)
+  const [selectedPresetName, setSelectedPresetName] = useState<string>('')
   const [maintainResolution, setMaintainResolution] = useState(true)
   const [processingState, setProcessingState] = useState<ProcessingState>('idle')
   const [progress, setProgress] = useState(0)
   const [status, setStatus] = useState('')
   const [compressedBlob, setCompressedBlob] = useState<Blob | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  const handleTargetSizeChange = (size: number) => {
+    setTargetSizeMB(size)
+    // 手動入力が行われた場合はプリセット選択をリセット
+    setSelectedPresetName('')
+  }
+
+  const handlePresetChange = (presetName: string) => {
+    setSelectedPresetName(presetName)
+    const preset = PRESETS.find((p) => p.name === presetName)
+    if (preset) {
+      setTargetSizeMB(preset.safeValue)
+    }
+  }
 
   const handleFileSelect = (selectedFile: File) => {
     if (!isVideoFile(selectedFile) && !isImageFile(selectedFile)) {
@@ -112,8 +141,11 @@ function App() {
               />
               <Settings
                 targetSizeMB={targetSizeMB}
+                presets={PRESETS}
+                selectedPresetName={selectedPresetName}
+                onPresetChange={handlePresetChange}
                 maintainResolution={maintainResolution}
-                onTargetSizeChange={setTargetSizeMB}
+                onTargetSizeChange={handleTargetSizeChange}
                 onMaintainResolutionChange={setMaintainResolution}
               />
             </>
@@ -140,8 +172,11 @@ function App() {
                 <>
                   <Settings
                     targetSizeMB={targetSizeMB}
+                    presets={PRESETS}
+                    selectedPresetName={selectedPresetName}
+                    onPresetChange={handlePresetChange}
                     maintainResolution={maintainResolution}
-                    onTargetSizeChange={setTargetSizeMB}
+                    onTargetSizeChange={handleTargetSizeChange}
                     onMaintainResolutionChange={setMaintainResolution}
                   />
                   <button
