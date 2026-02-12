@@ -114,6 +114,15 @@ function App() {
     }
   }, [])
 
+  const handleActivatePro = () => {
+    try {
+      window.localStorage.setItem('isProUser', 'true')
+    } catch {
+      // localStorage が使えなくてもセッション中は Pro 扱いにする
+    }
+    setIsProUser(true)
+  }
+
   const handleTargetSizeChange = (size: number) => {
     setTargetSizeMB(size)
     // 手動入力が行われた場合はプリセット選択をリセット
@@ -236,6 +245,7 @@ function App() {
                 onTargetSizeChange={handleTargetSizeChange}
                 onMaintainResolutionChange={setMaintainResolution}
                 isProUser={isProUser}
+                onActivatePro={handleActivatePro}
               />
             </>
           ) : (
@@ -268,6 +278,7 @@ function App() {
                     onTargetSizeChange={handleTargetSizeChange}
                     onMaintainResolutionChange={setMaintainResolution}
                     isProUser={isProUser}
+                    onActivatePro={handleActivatePro}
                   />
                   <button
                     onClick={handleCompress}

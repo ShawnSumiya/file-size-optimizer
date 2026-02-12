@@ -15,6 +15,7 @@ interface SettingsProps {
   selectedPresetName: string | null
   onPresetChange: (preset: Preset) => void
   isProUser: boolean
+  onActivatePro: () => void
 }
 
 export function Settings({
@@ -27,6 +28,7 @@ export function Settings({
   selectedPresetName,
   onPresetChange,
   isProUser,
+  onActivatePro,
 }: SettingsProps) {
   const allPresets = presetGroups.flatMap((group) => group.items)
 
@@ -70,11 +72,19 @@ export function Settings({
               type="button"
               className="ml-2 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 hover:bg-gray-200"
               onClick={() => {
-                alert('カスタムサイズ指定はPro版限定機能です')
+                const key = window.prompt('Proキーを入力してください (例: OPT-STD-2026-B2)')
+                if (!key) return
+
+                if (key === 'OPT-STD-2026-B2') {
+                  onActivatePro()
+                  alert('Pro版が有効になりました')
+                } else {
+                  alert('キーが正しくありません')
+                }
               }}
             >
-              <span className="mr-1">🔒</span>
-              Pro
+              <span className="mr-1">🔓</span>
+              Pro版
             </button>
           )}
         </div>
