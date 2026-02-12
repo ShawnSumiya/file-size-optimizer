@@ -23,6 +23,11 @@ export default defineConfig({
             type: 'image/svg+xml',
             purpose: 'any maskable',
           },
+          {
+            src: '/icon_512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+          },
         ],
       },
     }),
