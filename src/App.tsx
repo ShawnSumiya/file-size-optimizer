@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FileInput } from './components/FileInput'
 import { Settings } from './components/Settings'
 import { ProgressBar } from './components/ProgressBar'
 import { Result } from './components/Result'
+import { HistorySection } from './components/HistorySection'
 import { compressVideo } from './utils/videoCompression'
 import { compressImage } from './utils/imageCompression'
 
@@ -17,6 +18,14 @@ type Preset = {
 type PresetGroup = {
   label: string
   items: Preset[]
+}
+
+type HistoryItem = {
+  id: number
+  fileName: string
+  originalSize: number
+  compressedSize: number
+  createdAt: string
 }
 
 const PRESET_GROUPS: PresetGroup[] = [
@@ -75,6 +84,35 @@ function App() {
   const [status, setStatus] = useState('')
   const [compressedBlob, setCompressedBlob] = useState<Blob | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isProUser, setIsProUser] = useState(false)
+  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([])
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem('isProUser')
+      let isPro = stored === 'true'
+
+      const url = new URL(window.location.href)
+      const authToken = url.searchParams.get('auth')
+
+      if (authToken === 'v-studio-access-2025') {
+        isPro = true
+        window.localStorage.setItem('isProUser', 'true')
+      }
+
+      if (url.searchParams.has('auth')) {
+        url.searchParams.delete('auth')
+        const newUrl = url.pathname + url.search + url.hash
+        window.history.replaceState(null, '', newUrl)
+      }
+
+      if (isPro) {
+        setIsProUser(true)
+      }
+    } catch (err) {
+      console.error('Pro版認証の初期化に失敗しました:', err)
+    }
+  }, [])
 
   const handleTargetSizeChange = (size: number) => {
     setTargetSizeMB(size)
@@ -135,6 +173,17 @@ function App() {
       setProcessingState('completed')
       setStatus('完了')
       setProgress(100)
+
+      setHistoryItems((prev) => {
+        const newItem: HistoryItem = {
+          id: Date.now(),
+          fileName: file.name,
+          originalSize: file.size,
+          compressedSize: blob.size,
+          createdAt: new Date().toISOString(),
+        }
+        return [newItem, ...prev].slice(0, 10)
+      })
     } catch (err) {
       console.error('圧縮エラー:', err)
       setError(err instanceof Error ? err.message : '圧縮中にエラーが発生しました')
@@ -156,10 +205,17 @@ function App() {
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            File Size Optimizer
-          </h1>
-          <p className="text-gray-600">
+          <div className="flex flex-col items-center gap-2">
+            <h1 className="text-4xl font-bold text-gray-900">
+              File Size Optimizer
+            </h1>
+            {isProUser && (
+              <span className="inline-flex items-center rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700">
+                Pro Plan
+              </span>
+            )}
+          </div>
+          <p className="mt-3 text-gray-600">
             画像や動画を指定したファイルサイズ以内に圧縮します
           </p>
         </header>
@@ -257,6 +313,8 @@ function App() {
             </>
           )}
         </div>
+
+        <HistorySection items={historyItems} isProUser={isProUser} />
 
         <footer className="text-center mt-8 text-sm text-gray-500">
           <p>対応形式: 画像 (JPEG, PNG, WebP等) / 動画 (MP4, MOV等)</p>
