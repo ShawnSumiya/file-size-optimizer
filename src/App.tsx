@@ -235,6 +235,7 @@ function App() {
                 maintainResolution={maintainResolution}
                 onTargetSizeChange={handleTargetSizeChange}
                 onMaintainResolutionChange={setMaintainResolution}
+                isProUser={isProUser}
               />
             </>
           ) : (
@@ -266,6 +267,7 @@ function App() {
                     maintainResolution={maintainResolution}
                     onTargetSizeChange={handleTargetSizeChange}
                     onMaintainResolutionChange={setMaintainResolution}
+                    isProUser={isProUser}
                   />
                   <button
                     onClick={handleCompress}

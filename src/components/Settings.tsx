@@ -14,6 +14,7 @@ interface SettingsProps {
   presetGroups: PresetGroup[]
   selectedPresetName: string | null
   onPresetChange: (preset: Preset) => void
+  isProUser: boolean
 }
 
 export function Settings({
@@ -25,6 +26,7 @@ export function Settings({
   presetGroups,
   selectedPresetName,
   onPresetChange,
+  isProUser,
 }: SettingsProps) {
   const allPresets = presetGroups.flatMap((group) => group.items)
 
@@ -61,7 +63,21 @@ export function Settings({
       </div>
 
       <div>
-        <Label htmlFor="target-size">目標ファイルサイズ (MB)</Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="target-size">目標ファイルサイズ (MB)</Label>
+          {!isProUser && (
+            <button
+              type="button"
+              className="ml-2 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 hover:bg-gray-200"
+              onClick={() => {
+                alert('カスタムサイズ指定はPro版限定機能です')
+              }}
+            >
+              <span className="mr-1">🔒</span>
+              Pro
+            </button>
+          )}
+        </div>
         <Input
           id="target-size"
           type="number"
@@ -75,8 +91,8 @@ export function Settings({
               onTargetSizeChange(value)
             }
           }}
-          disabled={disabled}
-          className="mt-1"
+          disabled={disabled || !isProUser}
+          className="mt-1 disabled:bg-gray-100 disabled:cursor-not-allowed"
         />
         <p className="text-xs text-gray-500 mt-1">
           デフォルト: 19.5MB (Etsy等の20MB制限を考慮)
