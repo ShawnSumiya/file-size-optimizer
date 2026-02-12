@@ -72,7 +72,7 @@ export function Settings({
               type="button"
               className="ml-2 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 hover:bg-gray-200"
               onClick={() => {
-                const key = window.prompt('Proキーを入力してください (例: OPT-STD-2026-B2)')
+                const key = window.prompt('Proキーを入力してください')
                 if (!key) return
 
                 if (key === 'OPT-STD-2026-B2') {
